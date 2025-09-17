@@ -5,7 +5,7 @@ import type {
   FetchStatus,
   MutationKey,
   MutationStatus,
-  QueryFunction,
+  QueryFunction,₩
   QueryKey,
   QueryOptions,
   StaleTime,
@@ -214,7 +214,10 @@ export function hashQueryKeyByOptions<TQueryKey extends QueryKey = QueryKey>(
  * Hashes the value into a stable hash.
  */
 export function hashKey(queryKey: QueryKey | MutationKey): string {
-  return JSON.stringify(queryKey, (_, val) =>
+  return JSON.stringify(queryKey, (_, val) => {
+    if (typeof val === 'bigint') {
+      return val.toString() + 'n';
+    }
     isPlainObject(val)
       ? Object.keys(val)
           .sort()
@@ -222,7 +225,8 @@ export function hashKey(queryKey: QueryKey | MutationKey): string {
             result[key] = val[key]
             return result
           }, {} as any)
-      : val,
+      : val;
+  },
   )
 }
 
